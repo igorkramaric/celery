@@ -238,8 +238,9 @@ class Worker(_pool.Worker):
         # our version sends a WORKER_UP message when the process is ready
         # to accept work, this will tell the parent that the inqueue fd
         # is writable.
+        print("____ on_loop_start (and now sending WORKER_UP) START ____")
         self.outq.put((WORKER_UP, (pid,)))
-
+        print("____ on_loop_start (and now sending WORKER_UP) END ____")
 
 class ResultHandler(_pool.ResultHandler):
     """Handles messages from the pool processes."""
@@ -1116,6 +1117,7 @@ class AsynPool(_pool.Pool):
 
         Marks the process as ready to receive work.
         """
+        print("____ on_process_alive START ____")
         try:
             proc = next(w for w in self._pool if w.pid == pid)
         except StopIteration:
@@ -1126,6 +1128,8 @@ class AsynPool(_pool.Pool):
         self._fileno_to_inq[proc.inqW_fd] = proc
         self._fileno_to_synq[proc.synqW_fd] = proc
         self._all_inqueues.add(proc.inqW_fd)
+
+        print("____ on_process_alive END ____")
 
     def on_job_process_down(self, job, pid_gone):
         """Called for each job when the process assigned to it exits."""
